@@ -1,0 +1,15 @@
+cat > .gitignore << 'EOF'
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+.DS_Store
+*.wav
+*.iq
+EOF
+
+touch data/raw/.gitkeep data/processed/.gitkeep
