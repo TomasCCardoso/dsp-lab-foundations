@@ -11,6 +11,11 @@
  */
 
  void rb_init(RingBuffer *rb, float *storage, size_t size) {
+
+   if (rb == NULL || storage == NULL || size == 0) {
+        fprintf(stderr, "Erro: ponteiro nulo ou tamanho inválido no rb_init.\n");
+        return;
+    }
     rb->storage = storage;
     rb->size = size;
     rb->head = 0;
@@ -27,7 +32,15 @@
  * @param sample Sample to be stored.
  */
 
- void rb_push(RingBuffer *rb, float sample) {
+ void rb_push(RingBuffer *rb, float sample)
+{
+    if (rb == NULL || rb->storage == NULL || rb->size == 0)
+    {
+        fprintf(stderr,
+                "Error: invalid RingBuffer passed to rb_push().\n");
+        return;
+    }
+
     rb->storage[rb->head] = sample;
     rb->head = (rb->head + 1) % rb->size;
- }
+}
