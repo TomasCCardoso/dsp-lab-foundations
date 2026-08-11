@@ -44,3 +44,28 @@
     rb->storage[rb->head] = sample;
     rb->head = (rb->head + 1) % rb->size;
 }
+/**
+ * @brief Devolve a i-ésima amostra mais recente do buffer circular.
+ *
+ * i = 0 devolve a amostra mais recente (última escrita), i = 1 a
+ * segunda mais recente, e assim sucessivamente. A posição real no
+ * array é calculada com aritmética modular, somando rb->size antes
+ * de subtrair para evitar underflow em size_t (unsigned).
+ *
+ * @param rb Ponteiro para a estrutura RingBuffer.
+ * @param i  Posição relativa à amostra mais recente (0 = mais recente).
+ * @return   Valor da amostra pedida, ou 0.0f se os argumentos forem inválidos.
+ */
+
+float rb_get(RingBuffer *rb, size_t i) {
+
+    if (rb == NULL || rb->storage == NULL || rb->size == 0)
+    {
+        fprintf(stderr,
+                "Error: invalid RingBuffer passed to rb_push().\n");
+        return 0.0f;
+    }
+
+    size_t index = (rb->head + rb->size - 1 - i) % rb->size;
+    return rb->storage[index];
+}
