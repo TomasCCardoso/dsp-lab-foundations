@@ -1,33 +1,22 @@
 #include <stdio.h>
 #include <stddef.h>
 
-#include "ring_buffer.h"
+#include "ring_buffer/ring_buffer.h"
+#include "fir_filter/fir_filter.h"
 
 int main(void)
 {
-    float storage[4];
-    RingBuffer rb;
+    float coefficients[3] = {1.0f/3.0f, 1.0f/3.0f, 1.0f/3.0f};
+    float history_storage[3];
 
-    rb_init(&rb, storage, 4);
+    FirFilter filter;
+    fir_init(&filter, coefficients, 3, history_storage);
 
-    rb_push(&rb, 10.0f);
-    rb_push(&rb, 20.0f);
-    rb_push(&rb, 30.0f);
-    rb_push(&rb, 40.0f);
-    rb_push(&rb, 50.0f);
+    float input[6] = {10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f};
 
-    printf("Head = %zu\n", rb.head);
-
-    printf("\n--- Estado bruto do array (ordem de memoria) ---\n");
-    for (size_t i = 0; i < rb.size; i++)
-    {
-        printf("[%zu] = %.1f\n", i, rb.storage[i]);
-    }
-
-    printf("\n--- rb_get (ordem cronologica, mais recente primeiro) ---\n");
-    for (size_t i = 0; i < rb.size; i++)
-    {
-        printf("rb_get(%zu) = %.1f\n", i, rb_get(&rb, i));
+    for (size_t i = 0; i < 6; i++) {
+        float y = fir_process(&filter, input[i]);
+        printf("x[%zu] = %.2f  ->  y[%zu] = %.4f\n", i, input[i], i, y);
     }
 
     return 0;

@@ -36,5 +36,12 @@ typedef struct {
  *                           com capacidade >= num_coefficients floats.
  */
 void fir_init(FirFilter *filter, float *coefficients, size_t num_coefficients, float *history_storage);
-
+/**
+ * @brief Processa uma amostra de entrada e devolve a saída do filtro FIR.
+ *
+ * @param filter   Ponteiro para a estrutura FirFilter, já inicializada.
+ * @param x_n      Nova amostra de entrada, x[n].
+ * @return         Amostra de saída y[n].
+ */
+float fir_process(FirFilter *filter, float x_n);
 #endif // FIR_FILTER_H
