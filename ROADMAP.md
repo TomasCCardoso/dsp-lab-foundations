@@ -91,12 +91,12 @@ Timeline-alvo: portfólio com 2-3 projetos fortes (idealmente radar/EW, core da 
 ## Exercícios Técnicos
 
 ### Bloco C (reativação)
-1. Implementar em C puro (sem STL/bibliotecas externas): buffer circular genérico com push/pop
-2. Implementar um filtro FIR por convolução direta em C, comparar output com `scipy.signal.lfilter` para o mesmo conjunto de coeficientes — devem ser numericamente idênticos (tolerância de arredondamento)
-3. Implementar a mesma convolução em aritmética de ponto fixo Q15 — quantificar o erro introduzido face à versão float
+1. ✅ **[CONCLUÍDO]** Buffer circular genérico em C puro — struct `RingBuffer` (`storage`, `size`, `head`), `rb_init`, `rb_push` (wraparound via módulo), `rb_get` (aritmética modular inversa, `head + size - 1 - i`), validação defensiva completa, include guard. PRs #1-5 mergeados.
+2. ✅ **[CONCLUÍDO]** Filtro FIR por convolução direta em C — struct `FirFilter` (reutiliza `RingBuffer` internamente como histórico), `fir_init`, `fir_process`. Validado numericamente contra `scipy.signal.lfilter` (resultados idênticos para filtro de média móvel, 3 taps). Bug de acumulador (reutilização indevida de `x_n` em vez de acumulador limpo `y_n`) identificado e corrigido durante o desenvolvimento.
+3. ⏸️ **[ADIADO — não esquecido]** Implementar a mesma convolução em aritmética de ponto fixo Q15, quantificar o erro face à versão float. Teoria já coberta (representação Q15, overflow na multiplicação Q15×Q15, trade-offs float vs. fixo). Decisão consciente: avançar para o bloco Python agora para manter momentum; **retomar antes da Fase 7 (FPGA)**, onde ponto fixo deixa de ser opcional.
 
 ### Bloco Python/DSP aplicado
-4. Descarregar um dataset IQ público (ex: gravações de exemplo do repositório GNU Radio, ou datasets SigMF públicos) e:
+4. 🔄 **[EM CURSO]** Descarregar um dataset IQ público (ex: gravações de exemplo do repositório GNU Radio, ou datasets SigMF públicos) e:
    - Calcular e plotar a PSD (Welch)
    - Gerar um espectrograma (STFT)
    - Identificar visualmente o tipo de modulação presente (AM/FM/digital) justificando pela forma do espectro
@@ -121,12 +121,39 @@ Isto não precisa de hardware — usa datasets públicos. É a tua primeira entr
 
 ## Critérios de Conclusão da Fase 0
 
-- [ ] C: buffer circular e filtro FIR funcionais, com testes que comparam contra SciPy
-- [ ] Ponto fixo: relatório curto sobre o erro de quantização Q15 vs float
-- [ ] Git: repositório com histórico de commits limpo, branches usadas corretamente, README de qualidade profissional
+- [x] C: buffer circular e filtro FIR funcionais, com testes que comparam contra SciPy
+- [ ] Ponto fixo: relatório curto sobre o erro de quantização Q15 vs float *(adiado para antes da Fase 7)*
+- [x] Git: repositório com histórico de commits limpo, branches usadas corretamente (feature branches + PRs para cada função, mesmo sozinho)
 - [ ] Projeto IQ Analyzer funcional, documentado, publicado no GitHub
 - [ ] Hardware da Fase 1 encomendado
-- [ ] Ambiente de desenvolvimento completo e testado (Python, GNU Radio, toolchain C, STM32CubeIDE/PlatformIO)
+- [x] Ambiente de desenvolvimento completo e testado (Python + venv, GCC, toolchain C)
+
+## Nota — Estrutura do `src/` (decidida durante o desenvolvimento)
+
+O código C está organizado como pequena biblioteca modular, uma pasta por componente:
+
+```
+src/
+├── main.c              ← programa de teste manual, inclui os módulos abaixo
+├── ring_buffer/
+│   ├── ring_buffer.c
+│   └── ring_buffer.h
+└── fir_filter/
+    ├── fir_filter.c
+    └── fir_filter.h      (depende de ring_buffer/ring_buffer.h — FIR reutiliza o ring buffer como histórico)
+```
+
+Compilação: `gcc src/main.c src/ring_buffer/ring_buffer.c src/fir_filter/fir_filter.c -I src -o test_fir` (a partir da raiz do repo).
+
+## Log de Progresso
+
+| Data | Marco |
+|---|---|
+| 2026-08-04 | Setup inicial: perfil de partida registado, estrutura do repositório criada |
+| ~2026-08 | Ring buffer completo (`rb_init`, `rb_push`, `rb_get`) — Exercício 1 fechado |
+| ~2026-08 | Reorganização de `src/` em módulos (`ring_buffer/`, `fir_filter/`) |
+| ~2026-08 | Filtro FIR completo, validado contra SciPy — Exercício 2 fechado |
+| 2026-08-12 | Exercício 3 (Q15) adiado para antes da Fase 7; início do Exercício 4 (bloco Python, análise IQ) |
 
 ---
 
