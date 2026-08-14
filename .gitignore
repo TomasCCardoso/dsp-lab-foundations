@@ -13,4 +13,8 @@ data/processed/*
 *.sigmf-data
 EOF
 
+# Build Artifacts
+*.o
+*.out
+test_ring_buffer
 touch data/raw/.gitkeep data/processed/.gitkeep
