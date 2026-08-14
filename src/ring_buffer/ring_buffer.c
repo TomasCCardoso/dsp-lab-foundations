@@ -63,12 +63,9 @@ bool rb_get(const RingBuffer *rb, size_t i, float *out) {
 
     if (rb == NULL || rb->storage == NULL || rb->size == 0 || out == NULL)
     {
-        fprintf(stderr,
-                "Error: invalid RingBuffer passed to rb_get().\n");
         return false;
-    } else if(i >= rb->count) {
-        fprintf(stderr,
-                "Error: requested index %zu is out of bounds (count = %zu).\n", i, rb->count);
+    }
+    if(i >= rb->count) {
         return false;
     }
     size_t index = (rb->head + rb->size - 1 - i) % rb->size;
