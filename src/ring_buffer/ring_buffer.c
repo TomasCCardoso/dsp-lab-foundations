@@ -1,5 +1,6 @@
 #include "ring_buffer.h"
 #include <stdio.h>
+#include <stdbool.h>
 
 /**
  * @brief Inicializa o buffer circular.
@@ -19,6 +20,7 @@
     rb->storage = storage;
     rb->size = size;
     rb->head = 0;
+    rb->count = 0;
 }
 
 /**
@@ -43,29 +45,34 @@
 
     rb->storage[rb->head] = sample;
     rb->head = (rb->head + 1) % rb->size;
+    if (rb->count < rb->size) {
+        rb->count++;
+    }
 }
 /**
- * @brief Devolve a i-ésima amostra mais recente do buffer circular.
- *
- * i = 0 devolve a amostra mais recente (última escrita), i = 1 a
- * segunda mais recente, e assim sucessivamente. A posição real no
- * array é calculada com aritmética modular, somando rb->size antes
- * de subtrair para evitar underflow em size_t (unsigned).
+ * @brief Devolve true se a mostra na posição i for válida, devolve false caso contrário.
+ * O ponteiro out é usado para devolver o valor da amostra pedida.
  *
  * @param rb Ponteiro para a estrutura RingBuffer.
  * @param i  Posição relativa à amostra mais recente (0 = mais recente).
- * @return   Valor da amostra pedida, ou 0.0f se os argumentos forem inválidos.
+ * @param out Ponteiro para a variável onde armazenar o valor da amostra.
+ * @return   true se a amostra for válida, false caso contrário.
  */
 
-float rb_get(RingBuffer *rb, size_t i) {
+bool rb_get(const RingBuffer *rb, size_t i, float *out) {
 
-    if (rb == NULL || rb->storage == NULL || rb->size == 0)
+    if (rb == NULL || rb->storage == NULL || rb->size == 0 || out == NULL)
     {
         fprintf(stderr,
-                "Error: invalid RingBuffer passed to rb_push().\n");
-        return 0.0f;
+                "Error: invalid RingBuffer passed to rb_get().\n");
+        return false;
+    } else if(i >= rb->count) {
+        fprintf(stderr,
+                "Error: requested index %zu is out of bounds (count = %zu).\n", i, rb->count);
+        return false;
     }
-
     size_t index = (rb->head + rb->size - 1 - i) % rb->size;
-    return rb->storage[index];
+    *out = rb->storage[index];
+    return true;
 }
+
