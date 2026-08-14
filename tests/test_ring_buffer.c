@@ -92,11 +92,147 @@ void test_rb_push(void) {
       "rb_push stores the sample at the correct position");
 }
 
+/**
+ * @brief Verifies that multiple samples are stored and retrieved correctly.
+ *
+ * Pushes three samples into the RingBuffer and verifies:
+ * - samples are stored at the expected storage positions;
+ * - head advances correctly;
+ * - count reflects the number of stored samples;
+ * - rb_get() returns samples in reverse chronological order;
+ * - accessing an unavailable sample returns false.
+ */
+void test_rb_push_multiple(void) 
+{
+    float storage[4];
+    RingBuffer rb;
 
+    rb_init(&rb, storage, 4);
+
+    rb_push(&rb, 10.0f);
+    rb_push(&rb, 20.0f);
+    rb_push(&rb, 30.0f);
+
+    /* Verify internal buffer state. */
+    check(storage[0] == 10.0f,
+          "rb_push stores the first sample correctly");
+
+    check(storage[1] == 20.0f,
+          "rb_push stores the second sample correctly");
+
+    check(storage[2] == 30.0f,
+          "rb_push stores the third sample correctly");
+
+    check(rb.head == 3,
+          "rb_push advances head correctly after multiple samples");
+
+    check(rb.count == 3,
+          "rb_push increments count correctly after multiple samples");
+
+    /* Verify retrieval order. */
+    float out = 0.0f;
+    bool result;
+
+    result = rb_get(&rb, 0, &out);
+    check(result == true,
+          "rb_get returns true for the most recent sample");
+    check(out == 30.0f,
+          "rb_get retrieves the most recent sample correctly");
+
+    result = rb_get(&rb, 1, &out);
+    check(result == true,
+          "rb_get returns true for the second most recent sample");
+    check(out == 20.0f,
+          "rb_get retrieves the second most recent sample correctly");
+
+    result = rb_get(&rb, 2, &out);
+    check(result == true,
+          "rb_get returns true for the third most recent sample");
+    check(out == 10.0f,
+          "rb_get retrieves the third most recent sample correctly");
+
+    /* Verify access beyond the number of stored samples. */
+    result = rb_get(&rb, 3, &out);
+    check(result == false,
+          "rb_get returns false when requesting an unavailable sample");
+}
+
+void test_rb_wraparound(void)
+{
+    float storage[4];
+    RingBuffer rb;
+
+    rb_init(&rb, storage, 4);
+
+    /* Fill the buffer to capacity. */
+    rb_push(&rb, 10.0f);
+    rb_push(&rb, 20.0f);
+    rb_push(&rb, 30.0f);
+    rb_push(&rb, 40.0f);
+
+    /* Push additional samples to cause wraparound. */
+    rb_push(&rb, 50.0f);
+    rb_push(&rb, 60.0f);
+
+    /* Verify physical storage after wraparound. */
+    check(storage[0] == 50.0f,
+          "rb_push overwrites the oldest sample after wraparound");
+
+    check(storage[1] == 60.0f,
+          "rb_push overwrites the second oldest sample after wraparound");
+
+    check(storage[2] == 30.0f,
+          "rb_push preserves the third sample after wraparound");
+
+    check(storage[3] == 40.0f,
+          "rb_push preserves the fourth sample after wraparound");
+
+    /* Verify RingBuffer state after wraparound. */
+    check(rb.head == 2,
+          "rb_push wraps head correctly");
+
+    check(rb.count == 4,
+          "rb_push keeps count at capacity after wraparound");
+
+    /* Verify logical sample order. */
+    float out = 0.0f;
+    bool result;
+
+    result = rb_get(&rb, 0, &out);
+    check(result == true,
+          "rb_get returns true for the most recent sample after wraparound");
+    check(out == 60.0f,
+          "rb_get retrieves the most recent sample correctly after wraparound");
+
+    result = rb_get(&rb, 1, &out);
+    check(result == true,
+          "rb_get returns true for the second most recent sample after wraparound");
+    check(out == 50.0f,
+          "rb_get retrieves the second most recent sample correctly after wraparound");
+
+    result = rb_get(&rb, 2, &out);
+    check(result == true,
+          "rb_get returns true for the third most recent sample after wraparound");
+    check(out == 40.0f,
+          "rb_get retrieves the third most recent sample correctly after wraparound");
+
+    result = rb_get(&rb, 3, &out);
+    check(result == true,
+          "rb_get returns true for the fourth most recent sample after wraparound");
+    check(out == 30.0f,
+          "rb_get retrieves the fourth most recent sample correctly after wraparound");
+
+    /* Verify access beyond the available samples. */
+    result = rb_get(&rb, 4, &out);
+    check(result == false,
+          "rb_get returns false when accessing beyond buffer contents");
+} 
 
 int main() {
     test_rb_init_state();
     test_rb_get_empty();
     test_rb_push();
+    test_rb_push_multiple();
+    test_rb_wraparound();
     return 0;
 }
