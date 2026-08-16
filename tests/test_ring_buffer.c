@@ -228,11 +228,47 @@ void test_rb_wraparound(void)
           "rb_get returns false when accessing beyond buffer contents");
 } 
 
+/**
+ * @brief Verifies that count increases until the buffer reaches capacity.
+ *
+ * Checks that count is incremented for each push while the buffer is
+ * partially filled and remains equal to the buffer capacity once full.
+ */
+
+void test_rb_count_capacity(void)
+{
+    float storage[4];
+    RingBuffer rb;
+
+    rb_init(&rb, storage, 4);
+
+    rb_push(&rb, 10.0f);
+    check(rb.count == 1,
+          "count is 1 after first push");
+
+    rb_push(&rb, 20.0f);
+    check(rb.count == 2,
+          "count is 2 after second push");
+
+    rb_push(&rb, 30.0f);
+    check(rb.count == 3,
+          "count is 3 after third push");
+
+    rb_push(&rb, 40.0f);
+    check(rb.count == 4,
+          "count is 4 after fourth push (buffer full)");
+
+    rb_push(&rb, 50.0f);
+    check(rb.count == 4,
+          "count remains at capacity after additional push");
+}
+
 int main() {
-    test_rb_init_state();
-    test_rb_get_empty();
-    test_rb_push();
-    test_rb_push_multiple();
-    test_rb_wraparound();
+    test_rb_init_state(); //Initial State Test
+    test_rb_get_empty(); //Empty Buffer Test
+    test_rb_push(); //Single Push Test
+    test_rb_push_multiple(); //Multiple Push Test
+    test_rb_wraparound(); //Wraparound Test
+    test_rb_count_capacity(); //Count and Capacity Test
     return 0;
 }
