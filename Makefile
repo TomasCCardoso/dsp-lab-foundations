@@ -4,6 +4,7 @@ CFLAGS = -Wall -Wextra -std=c11 -I src
 
 test: test_ring_buffer
 	./test_ring_buffer
+	./test_fir_filter
 clean: 
 	rm -f test_ring_buffer ring_buffer.o test_ring_buffer.o fir_filter.o test_fir_filter.o test_fir_filter
 
