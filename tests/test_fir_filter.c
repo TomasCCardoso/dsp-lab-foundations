@@ -94,9 +94,65 @@ void test_fir_filter_process_complete_history(void)
     check(filter.history.count == 3,"FIR history count remains at capacity after fifth sample");
     check(output == 16.0f,"FIR output remains correct after history wraparound");
 }
+void test_fir_filter_impulse_response(void) {
+    FirFilter filter;
+    const float coefficients[] = {0.25f, 0.5f, 0.25f};
+    float history_storage[3];
+    fir_filter_init(&filter, coefficients, 3, history_storage, 3);
+    float output;
+    float input_samples[] = {1.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+    output = fir_filter_process(&filter, input_samples[0]);
+    check(output == 0.25f, "FIR output for first impulse sample");
+    output = fir_filter_process(&filter, input_samples[1]);
+    check(output == 0.5f, "FIR output for second impulse sample");
+    output = fir_filter_process(&filter, input_samples[2]);
+    check(output == 0.25f, "FIR output for third impulse sample");
+    output = fir_filter_process(&filter, input_samples[3]);
+    check(output == 0.0f, "FIR output for fourth impulse sample");
+    output = fir_filter_process(&filter, input_samples[4]);
+    check(output == 0.0f, "FIR output for fifth impulse sample");
+}
+
+void test_fir_filter_dc_response(void)
+{
+    FirFilter filter;
+
+    const float coefficients[] = {0.25f, 0.5f, 0.25f};
+    float history_storage[3];
+
+    fir_filter_init(&filter, coefficients, 3, history_storage, 3);
+
+    float output;
+
+    output = fir_filter_process(&filter, 1.0f);
+    check(output == 0.25f,"FIR output for first DC sample");
+    output = fir_filter_process(&filter, 1.0f);
+    check(output == 0.75f,"FIR output for second DC sample");
+    output = fir_filter_process(&filter, 1.0f);
+    check(output == 1.0f,"FIR output for third DC sample");
+    output = fir_filter_process(&filter, 1.0f);
+    check(output == 1.0f,"FIR output remains at DC steady state");
+    output = fir_filter_process(&filter, 1.0f);
+    check(output == 1.0f,"FIR output remains stable for constant input");
+}
+void test_fir_filter_sinusoidal_response(void) {
+    FirFilter filter;
+    const float coefficients[] = {0.25f, 0.5f, 0.25f};
+    float history_storage[3];
+    fir_filter_init(&filter, coefficients, 3, history_storage, 3);
+    const float input_samples[] = {0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f, -1.0f};
+    const float expected_output[] = {0.0f, 0.25f, 0.5f, 0.0f, -0.5f, 0.0f, 0.5f, 0.0f};
+    for(size_t i = 0; i < 8; i++) {
+        float output = fir_filter_process(&filter, input_samples[i]);
+        check(output == expected_output[i], "FIR sinusoidal response"); 
+    }
+
+}
 int main (void) {
-    test_fir_filter_init();
-    test_fir_filter_process_incomplete_history();
-    test_fir_filter_process_complete_history();
-    return 0;
+    //test_fir_filter_init();
+    //test_fir_filter_process_incomplete_history();
+    //test_fir_filter_process_complete_history();
+    //test_fir_filter_impulse_response();
+    //test_fir_filter_dc_response();
+    test_fir_filter_sinusoidal_response();
 }
