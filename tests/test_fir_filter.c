@@ -149,10 +149,10 @@ void test_fir_filter_sinusoidal_response(void) {
 
 }
 int main (void) {
-    //test_fir_filter_init();
-    //test_fir_filter_process_incomplete_history();
-    //test_fir_filter_process_complete_history();
-    //test_fir_filter_impulse_response();
-    //test_fir_filter_dc_response();
+    test_fir_filter_init();
+    test_fir_filter_process_incomplete_history();
+    test_fir_filter_process_complete_history();
+    test_fir_filter_impulse_response();
+    test_fir_filter_dc_response();
     test_fir_filter_sinusoidal_response();
 }
