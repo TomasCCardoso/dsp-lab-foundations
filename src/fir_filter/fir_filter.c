@@ -1,13 +1,6 @@
 #include "fir_filter/fir_filter.h"
 
-bool fir_filter_init(
-    FirFilter *filter,
-    const float *coefficients,
-    size_t num_coefficients,
-    float *history_storage,
-    size_t history_size
-)
-{
+bool fir_filter_init(FirFilter *filter, const float *coefficients, size_t num_coefficients, float *history_storage,size_t history_size) {
     /*
      * Validate all input parameters before modifying the filter state.
      *
