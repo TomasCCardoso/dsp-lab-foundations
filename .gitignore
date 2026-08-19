@@ -1,20 +1,25 @@
 cat > .gitignore << 'EOF'
+# Python
 venv/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+
+# Datasets
 data/raw/*
 !data/raw/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
-.DS_Store
 *.wav
 *.iq
 *.sigmf-data
-EOF
 
-# Build Artifacts
+# macOS
+.DS_Store
+
+# Build Artifacts (C)
 *.o
 *.out
 test_ring_buffer
-touch data/raw/.gitkeep data/processed/.gitkeeptest_fir_filter
+test_fir_filter
+EOF
