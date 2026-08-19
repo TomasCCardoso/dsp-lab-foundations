@@ -17,4 +17,4 @@ EOF
 *.o
 *.out
 test_ring_buffer
-touch data/raw/.gitkeep data/processed/.gitkeep
+touch data/raw/.gitkeep data/processed/.gitkeeptest_fir_filter
