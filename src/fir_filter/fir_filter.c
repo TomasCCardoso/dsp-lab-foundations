@@ -31,3 +31,44 @@ bool fir_filter_init(FirFilter *filter, const float *coefficients, size_t num_co
 
     return true;
 }
+/**
+ * @brief Processa uma nova amostra através do filtro FIR.
+ *
+ * Armazena a nova amostra no buffer de histórico e calcula a saída
+ * do filtro através da convolução entre os coeficientes e as amostras
+ * de entrada disponíveis.
+ *
+ * A equação implementada é:
+ *
+ *     y[n] = sum(h[k] * x[n-k])
+ *
+ * Enquanto o histórico ainda não tiver num_coefficients amostras
+ * reais (logo após a inicialização do filtro), os coeficientes cujas
+ * amostras x[n-k] ainda não existem são simplesmente ignorados na
+ * soma — não é feito zero-padding explícito, mas o resultado
+ * numérico é equivalente a tratá-las como zero.
+ *
+ * @param filter Ponteiro para o filtro FIR.
+ * @param input_sample Nova amostra de entrada x[n].
+ * @return Amostra de saída y[n].
+ */
+float fir_filter_process(FirFilter *filter, float input_sample)
+{
+    float output_sample = 0.0f;
+
+    /* Store the new input sample in the history buffer. */
+    rb_push(&filter->history, input_sample);
+
+    /* Compute the FIR convolution. */
+    for (size_t i = 0; i < filter->num_coefficients; i++)
+    {
+        float history_sample;
+
+        if (rb_get(&filter->history, i, &history_sample))
+        {
+            output_sample += filter->coefficients[i] * history_sample;
+        }
+    }
+
+    return output_sample;
+}
