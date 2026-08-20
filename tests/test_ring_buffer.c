@@ -2,22 +2,9 @@
 #include <stdbool.h>
 
 #include "ring_buffer/ring_buffer.h"
-/**
- * @brief Reports the result of a test condition.
- *
- * Prints a PASS message when the condition evaluates to true
- * and a FAIL message otherwise.
- *
- * @param condition Boolean condition being evaluated.
- * @param message Description of the test being performed.
- */
-void check(bool condition, const char *message) {
-    if(condition) {
-        printf("PASS: %s\n", message);
-    } else {
-        printf("FAIL: %s\n", message);
-    }
-}
+#include "test_utils.h"
+
+
 /**
  * @brief Verifies the initial state of a RingBuffer after initialization.
  *

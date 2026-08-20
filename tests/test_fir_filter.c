@@ -1,13 +1,7 @@
 #include "fir_filter/fir_filter.h"
-#include <stdio.h>
+#include "test_utils.h"
 
-void check(bool condition, const char *message) {
-    if(condition) {
-        printf("PASS: %s\n", message);
-    } else {
-        printf("FAIL: %s\n", message);
-    }
-}
+#include <stdio.h>
 
 void test_fir_filter_init(void) {
     FirFilter filter;
