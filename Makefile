@@ -2,7 +2,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c11 -I src
 
-test: test_ring_buffer
+test: test_ring_buffer test_fir_filter
 	./test_ring_buffer
 	./test_fir_filter
 clean: 
