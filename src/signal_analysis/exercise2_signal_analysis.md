@@ -1,0 +1,7 @@
+The problem:
+- 3 sines: 50Hz 120Hz and 300Hz, Amplitudes: 1.0, 0.5, 0.2
+- White Gaussian Noise included
+
+Which sampling frequency to choose? By definition, the Nyquist frequency is half the sampling frequency: f_Nyquist = f_s/2. To avoid aliasing, the sampling frequency must satisfy f_s ≥ 2·f_max = 600 Hz. In practice, since this is not a real ADC with an expensive anti-aliasing filter, I used a sampling frequency 4–10× larger than the maximum frequency, not just a small safety margin over the Nyquist limit, because oversampling also improves the visual resolution of the spectrum and leaves margin so that the highest-frequency tone does not sit at the edge of the plot. Based on this, I chose f_s = 2000 Hz, approximately 6.7× the maximum frequency.
+
+Which duration should the observation window have? The most restrictive pair is 50–120 Hz, only 70 Hz apart. Spectral resolution is defined by Δf = 1/T: the longer T is, the finer the resolution becomes, since the frequency bins get closer together. Theoretically, the minimum required duration is T = 0.0143 s, but this sits right at the limit for the closest pair, leaving the resulting peaks poorly separated with no margin. Since the Hann window widens the main lobe by approximately 2× compared to a rectangular window, extra margin above that minimum is required. For this reason, and since this is a didactic analysis, I chose T = 1 s, giving Δf = 1 Hz — a wide margin that clearly resolves all three tones.
