@@ -58,7 +58,7 @@ magnitude_db = 20 * np.log10(magnitude + 1e-12)        # Magnitude in dB (epsilo
 # ============================================================
 f_low = 95           # Lower cutoff frequency (Hz)
 f_high = 145          # Upper cutoff frequency (Hz)
-filter_order = 4       # Order 4: sufficient given sosfiltfilt doubles the effective rolloff
+filter_order = 10       # Order 4: sufficient given sosfiltfilt doubles the effective rolloff
 
 # scipy expects normalized frequencies (fraction of the Nyquist frequency)
 nyquist = f_sampling / 2
